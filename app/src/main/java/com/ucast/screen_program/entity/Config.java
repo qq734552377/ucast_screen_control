@@ -8,6 +8,8 @@ import com.ucast.screen_program.app.CrashHandler;
  */
 public class Config {
     public static String STATION_ID = "SN98787";
+    public final static String ScreenServer = "192.168.3.1";
+    public final static int ScreenServerPort = 5050;
     public final static String PrinterSerialName = "ttymxc4";
     public final static String UsbWithByteSerialName = "g_print0";
     public final static String NETPrintName = "ucast_net_print";
@@ -19,4 +21,6 @@ public class Config {
     public final static int USB_BAIDRATE = 115200;
     public final static int NET_PRINT_PORT = 43078;
     public static final String PICPATHDIR =  CrashHandler.ALBUM_PATH + "/pic";
+
+
 }

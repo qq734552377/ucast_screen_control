@@ -55,11 +55,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                new Thread(new Runnable() {
+                UpdateService.poolExecutor.execute(new Runnable() {
+                    @Override
                     public void run() {
                         connect();
                     }
-                }).start();
+                });
             }
         });
 
@@ -68,11 +69,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                new Thread(new Runnable() {
+                UpdateService.poolExecutor.execute(new Runnable() {
+                    @Override
                     public void run() {
                         disconnect();
                     }
-                }).start();
+                });
             }
         });
 
@@ -123,13 +125,15 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                new Thread(new Runnable() {
+
+                UpdateService.poolExecutor.execute(new Runnable() {
+                    @Override
                     public void run() {
                         screen.	deletePrograms();
 
                         writeProgram();
                     }
-                }).start();
+                });
             }
         });
 
@@ -239,40 +243,42 @@ public class MainActivity extends AppCompatActivity {
 
         List<String> programs = null;
         Bx6GScreenClient curScreen = screen;
-        if (!curScreen .isConnected()){
+        List<ProgramJsonObj> msgs = MyHttpRequetTool.msgs;
+        if(msgs == null){
+            return;
+        }
+        if (curScreen == null || !curScreen .isConnected()){
             return;
         }
         try {
             programs = curScreen.readProgramList();
-        } catch (Bx6GCommException e) {
+
+            if (programs != null) {
+                List<Integer> ids = new ArrayList<>();
+                for (int i = 0; i < programs.size(); i++) {
+                    String name = programs.get(i);
+                    if (name.contains("P")) {
+                        ids.add(MyScreenTools.getIdByProgramName(name));
+                    }
+                }
+                ids = removeUnavialablePrograms(curScreen,ids,msgs);
+                for (int i = 0; i < msgs.size(); i++) {
+                    ProgramJsonObj one = msgs.get(i);
+                    if(!isExitInListID(one,ids)){
+                        ProgramBxFile programBxFile = MyScreenTools.getOneProgramBxFileWithProgramJsonObj(curScreen.getProfile(),one);
+                        if(programBxFile == null){
+                            continue;
+                        }
+                        try {
+                            curScreen.writeProgramQuickly(programBxFile);
+                        } catch (Bx6GException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        if (programs != null) {
-            List<Integer> ids = new ArrayList<>();
-            for (int i = 0; i < programs.size(); i++) {
-                String name = programs.get(i);
-                if (name.contains("P")) {
-                    ids.add(MyScreenTools.getIdByProgramName(name));
-                }
-            }
-            if(MyHttpRequetTool.msgs == null){
-                return;
-            }
-            ids = removeUnavialablePrograms(curScreen,ids,MyHttpRequetTool.msgs);
-            for (int i = 0; i < MyHttpRequetTool.msgs.size(); i++) {
-                ProgramJsonObj one = MyHttpRequetTool.msgs.get(i);
-                if(!isExitInListID(one,ids)){
-                    ProgramBxFile programBxFile = MyScreenTools.getOneProgramBxFileWithProgramJsonObj(curScreen.getProfile(),one);
-                    if(programBxFile == null){
-                        continue;
-                    }
-                    try {
-                        curScreen.writeProgramQuickly(programBxFile);
-                    } catch (Bx6GException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
         }
 
     }
@@ -290,6 +296,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean isExitInProgramlists(int id ,List<ProgramJsonObj> programJsonObjs){
+        if (programJsonObjs.size() <= 0){
+            return false;
+        }
         for (int i = 0; i < programJsonObjs.size(); i++) {
             if (id == programJsonObjs.get(i).getId()){
                 return true;
@@ -299,6 +308,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean isExitInListID(ProgramJsonObj one,List<Integer> ids){
+        if (ids.size() <= 0){
+            return false;
+        }
         for (int i = 0; i < ids.size(); i++) {
             if (ids.get(i) == one.getId()){
                 return true;

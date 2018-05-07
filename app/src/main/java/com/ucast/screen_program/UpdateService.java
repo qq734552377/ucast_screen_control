@@ -10,12 +10,14 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
-import com.ucast.screen_program.app.CrashHandler;
+import com.ucast.screen_program.app.ExceptionApplication;
 import com.ucast.screen_program.entity.Config;
 import com.ucast.screen_program.entity.ScreenHttpRequestUrl;
 import com.ucast.screen_program.jsonObject.BaseHttpResult;
 import com.ucast.screen_program.mytime.MyTimeTask;
 import com.ucast.screen_program.mytime.MyTimer;
+import com.ucast.screen_program.tools.MyHttpRequetTool;
+import com.ucast.screen_program.entity.MyScreenUpdateTask;
 
 import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
@@ -26,6 +28,14 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import de.greenrobot.event.EventBus;
+import de.greenrobot.event.Subscribe;
+import de.greenrobot.event.ThreadMode;
+import onbon.bx06.Bx6GScreenClient;
 
 
 /**
@@ -33,6 +43,8 @@ import java.util.Date;
  */
 public class UpdateService extends Service {
 
+    public static ThreadPoolExecutor poolExecutor;
+    public static Bx6GScreenClient screen;
 
     @Nullable
     @Override
@@ -62,12 +74,27 @@ public class UpdateService extends Service {
             file.mkdir();
         }
 
+        poolExecutor = new ThreadPoolExecutor(1, 1,
+                0, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(128));
+        EventBus.getDefault().register(this);
+    }
+
+    public static void writeToScreen(Runnable task){
+        if (poolExecutor == null || task == null)
+            return;
+        poolExecutor.execute(task);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MainThread, sticky = true)
+    public void addTaskToQueue(String msg){
+        writeToScreen(new MyScreenUpdateTask(screen));
     }
 
     /**
      * 当服务被杀死时重启服务
      * */
     public void onDestroy() {
+        EventBus.getDefault().unregister(this);
         stopForeground(true);
         Intent localIntent = new Intent();
         localIntent.setClass(this, UpdateService.class);
@@ -88,6 +115,8 @@ public class UpdateService extends Service {
 
     private static final String TAG = "UpdateService";
     public void getSystemTime(String url){
+        if (!MyHttpRequetTool.isNetworkAvailable(ExceptionApplication.getInstance()))
+            return;
         RequestParams params = new RequestParams(url);
         params.addBodyParameter("Sn", Config.STATION_ID);
         x.http().post(params, new Callback.CommonCallback<String>() {

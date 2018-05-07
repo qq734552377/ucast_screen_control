@@ -1,13 +1,11 @@
 package com.ucast.screen_program.tools;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.view.View;
 
 import com.alibaba.fastjson.JSON;
-import com.ucast.screen_program.app.CrashHandler;
+import com.ucast.screen_program.app.ExceptionApplication;
 import com.ucast.screen_program.entity.Config;
 import com.ucast.screen_program.jsonObject.BaseHttpResult;
 import com.ucast.screen_program.jsonObject.ProgramJsonObj;
@@ -19,6 +17,8 @@ import org.xutils.x;
 import java.io.File;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
+
 /**
  * Created by pj on 2018/4/28.
  */
@@ -27,6 +27,8 @@ public class MyHttpRequetTool {
 
 
     public static void getAllPrograms(String url){
+        if (!isNetworkAvailable(ExceptionApplication.getInstance()))
+            return;
         RequestParams params = new RequestParams(url);
         params.addBodyParameter("Sn", Config.STATION_ID);
         x.http().post(params, new Callback.CommonCallback<String>() {
@@ -34,6 +36,7 @@ public class MyHttpRequetTool {
             public void onSuccess(String result) {
                 BaseHttpResult base = JSON.parseObject(result, BaseHttpResult.class);
                 msgs = JSON.parseArray(base.getData(), ProgramJsonObj.class);
+                EventBus.getDefault().postSticky("this is getAllPrograms success");
             }
 
             @Override
@@ -54,12 +57,14 @@ public class MyHttpRequetTool {
     }
 
     public static void downLoadOnePic (String url,final String filePath){
+        if (!isNetworkAvailable(ExceptionApplication.getInstance()))
+            return;
         RequestParams requestParams = new RequestParams(url);
         requestParams.setSaveFilePath(filePath);
         x.http().get(requestParams, new Callback.CommonCallback<File>() {
             @Override
             public void onSuccess(File result) {
-
+                EventBus.getDefault().postSticky("this is downLoadOnePic success");
             }
 
             @Override

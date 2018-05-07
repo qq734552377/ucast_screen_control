@@ -270,7 +270,7 @@ public class MyScreenTools {
 
 
     public static String isExitInSdcard(String url){
-        String path = Config.PICPATHDIR + url.substring(url.lastIndexOf("？") + 1) ;
+        String path = Config.PICPATHDIR + url.substring(url.lastIndexOf("/") + 1) ;
         File file = new File(path);
         if (!file.exists()){
             MyHttpRequetTool.downLoadOnePic(url,path);
