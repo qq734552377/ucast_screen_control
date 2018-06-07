@@ -18,7 +18,7 @@ public class ReConnectScreen {
 
     private static long oldTime;
 
-    private final static long notifyUpdateScreenPeriod = 90 * 1000L;
+    private final static long notifyUpdateScreenPeriod = 10 * 1000L;
 
     public static void startTimer() {
         timer = new MyTimer(new MyTimeTask(new Runnable() {
@@ -46,7 +46,7 @@ public class ReConnectScreen {
                     }
                 }
             }
-        }), 2000L, 15000L);
+        }), 2000L, 5000L);
         timer.initMyTimer().startMyTimer();
     }
 

@@ -1,6 +1,7 @@
 package com.ucast.screen_program;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,11 +12,12 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.ucast.screen_program.entity.ReConnectScreen;
+import com.ucast.screen_program.entity.ScreenHttpRequestUrl;
 import com.ucast.screen_program.jsonObject.ProgramJsonObj;
 import com.ucast.screen_program.tools.MyHttpRequetTool;
 import com.ucast.screen_program.tools.MyScreenTools;
 
-import java.awt.Color;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -129,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 UpdateService.poolExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        screen.	deletePrograms();
+//                        screen.	deletePrograms();
 
                         writeProgram();
                     }
@@ -138,12 +140,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
         this.screen = new Bx6GScreenClient("UcastScreen");
+
+        UpdateService.screen = this.screen;
+
+//        MyHttpRequetTool.getAllPrograms(ScreenHttpRequestUrl.DOWNLOADFILEURL);
     }
 
     private boolean testDeployOKorNot() {
         try {
             int size = onbon.db.Factory.getIstance().fineSeriesList().size();
-            this.connButton.setTextColor(Color.blue._color());
+            this.connButton.setTextColor(Color.BLUE);
             this.connButton.setText("OK. Series Size:" + size);
             return true;
         }
@@ -155,6 +161,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void connect() {
+        if(this.screen.isConnected())
+            return;
         final TextView addrText = (TextView)findViewById(R.id.addrText);
         final TextView portText = (TextView)findViewById(R.id.portText);
         if (screen.connect("" + addrText.getText(), Integer.parseInt("" + portText.getText()))) {
@@ -178,13 +186,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void disconnect() {
-        this.screen.disconnect();
-        runOnUiThread(new Runnable() {
+//        this.screen.disconnect();
+//        runOnUiThread(new Runnable() {
+//            public void run() {
+//                MainActivity.this.connButton.setEnabled(true);
+//                MainActivity.this.disconnButton.setEnabled(false);
+//                MainActivity.this.sendButton.setEnabled(false);
+//                MainActivity.this.screenButton.setEnabled(false);
+//            }
+//        });
+        UpdateService.poolExecutor.execute(new Runnable() {
+            @Override
             public void run() {
-                MainActivity.this.connButton.setEnabled(true);
-                MainActivity.this.disconnButton.setEnabled(false);
-                MainActivity.this.sendButton.setEnabled(false);
-                MainActivity.this.screenButton.setEnabled(false);
+                screen.	deletePrograms();
             }
         });
     }

@@ -48,13 +48,12 @@
         android:id="@+id/disconnButton"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:enabled="false"
-        android:text="DISCONN"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="8dp"
         android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginEnd="8dp" />
+        android:enabled="false"
+        android:text="清屏"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
     <EditText
         android:id="@+id/msgText"

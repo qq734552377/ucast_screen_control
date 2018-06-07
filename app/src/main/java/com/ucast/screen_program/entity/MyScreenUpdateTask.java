@@ -1,6 +1,7 @@
 package com.ucast.screen_program.entity;
 
 import com.ucast.screen_program.jsonObject.ProgramJsonObj;
+import com.ucast.screen_program.tools.FileTools;
 import com.ucast.screen_program.tools.MyHttpRequetTool;
 import com.ucast.screen_program.tools.MyScreenTools;
 
@@ -31,9 +32,11 @@ public class MyScreenUpdateTask implements Runnable{
         Bx6GScreenClient curScreen = screen;
         List<ProgramJsonObj> msgs = MyHttpRequetTool.msgs;
         if(msgs == null){
+            FileTools.writeToLogFile("从网上获取的节目单为空");
             return;
         }
         if (curScreen == null || !curScreen .isConnected()){
+            FileTools.writeToLogFile("没有连接到灯板");
             return;
         }
         try {
@@ -44,6 +47,7 @@ public class MyScreenUpdateTask implements Runnable{
                 for (int i = 0; i < programs.size(); i++) {
                     String name = programs.get(i);
                     if (name.contains("P")) {
+                        FileTools.writeToLogFile("灯板已有的节目  节目号为：" + name);
                         ids.add(MyScreenTools.getIdByProgramName(name));
                     }
                 }
@@ -56,6 +60,7 @@ public class MyScreenUpdateTask implements Runnable{
                             continue;
                         }
                         try {
+                            FileTools.writeToLogFile("向灯板推送节目  节目号为：" + one.getId());
                             curScreen.writeProgramQuickly(programBxFile);
                         } catch (Bx6GException e) {
                             e.printStackTrace();

@@ -215,4 +215,31 @@ public class ProgramJsonObj {
     public void setTexFontColor(String texFontColor) {
         this.texFontColor = texFontColor;
     }
+
+    @Override
+    public String toString() {
+        return "ProgramJsonObj{" +
+                "id=" + id +
+                ", \nstartData='" + startData + '\'' +
+                ", \nendData='" + endData + '\'' +
+                ", \npriority='" + priority + '\'' +
+                ", \nisDisplay=" + isDisplay +
+                ", \nduration=" + duration +
+                ", \nhaveFrame=" + haveFrame +
+                ", \nframeSpeed=" + frameSpeed +
+                ", \nfarmeStyle=" + farmeStyle +
+                ", \nprogramType=" + programType +
+                ", \ndisplayStyle=" + displayStyle +
+                ", \ndisplayStyleSpeed=" + displayStyleSpeed +
+                ", \nstayDuration=" + stayDuration +
+                ", \npicDownLoadUrl='" + picDownLoadUrl + '\'' +
+                ", \ntextContent='" + textContent + '\'' +
+                ", \nisTextAutoNewLine=" + isTextAutoNewLine +
+                ", \nhorizontalAlignment=" + horizontalAlignment +
+                ", \nverticalAlignment=" + verticalAlignment +
+                ", \ntexFontType='" + texFontType + '\'' +
+                ", \ntexFontSize=" + texFontSize +
+                ", \ntexFontColor='" + texFontColor + '\'' +
+                '}';
+    }
 }

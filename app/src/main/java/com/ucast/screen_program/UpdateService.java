@@ -12,10 +12,12 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.ucast.screen_program.app.ExceptionApplication;
 import com.ucast.screen_program.entity.Config;
+import com.ucast.screen_program.entity.ReConnectScreen;
 import com.ucast.screen_program.entity.ScreenHttpRequestUrl;
 import com.ucast.screen_program.jsonObject.BaseHttpResult;
 import com.ucast.screen_program.mytime.MyTimeTask;
 import com.ucast.screen_program.mytime.MyTimer;
+import com.ucast.screen_program.tools.FileTools;
 import com.ucast.screen_program.tools.MyHttpRequetTool;
 import com.ucast.screen_program.entity.MyScreenUpdateTask;
 
@@ -66,7 +68,7 @@ public class UpdateService extends Service {
         notification.flags |= Notification.FLAG_FOREGROUND_SERVICE;
         startForeground(1, notification);
         super.onCreate();
-        startTimer();
+//        startTimer();
         copyCfg("pic2.jpg");
         copyCfg("pic4.jpg");
         File file = new File(Config.PICPATHDIR);
@@ -74,9 +76,14 @@ public class UpdateService extends Service {
             file.mkdir();
         }
 
+
+
         poolExecutor = new ThreadPoolExecutor(1, 1,
                 0, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(128));
         EventBus.getDefault().register(this);
+
+        //开启节目请求
+        ReConnectScreen.startTimer();
     }
 
     public static void writeToScreen(Runnable task){
@@ -87,6 +94,7 @@ public class UpdateService extends Service {
 
     @Subscribe(threadMode = ThreadMode.MainThread, sticky = true)
     public void addTaskToQueue(String msg){
+        FileTools.writeToLogFile("调用了一次 UpdateService.addTaskToQueue()");
         writeToScreen(new MyScreenUpdateTask(screen));
     }
 

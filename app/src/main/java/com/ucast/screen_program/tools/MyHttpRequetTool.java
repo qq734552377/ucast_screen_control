@@ -36,6 +36,9 @@ public class MyHttpRequetTool {
             public void onSuccess(String result) {
                 BaseHttpResult base = JSON.parseObject(result, BaseHttpResult.class);
                 msgs = JSON.parseArray(base.getData(), ProgramJsonObj.class);
+                for (int i = 0; i <msgs.size() ; i++) {
+                    FileTools.writeToFile(Config.LOGFILEPATH,msgs.get(i).toString() + "-------------------");
+                }
                 EventBus.getDefault().postSticky("this is getAllPrograms success");
             }
 

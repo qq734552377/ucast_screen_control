@@ -21,6 +21,9 @@ public class Config {
     public final static int USB_BAIDRATE = 115200;
     public final static int NET_PRINT_PORT = 43078;
     public static final String PICPATHDIR =  CrashHandler.ALBUM_PATH + "/pic";
+    public static final String LOGFILEDIR =  CrashHandler.ALBUM_PATH + "/pic";
+    public static final String LOGFILEPATH = LOGFILEDIR + "/msgs.log";
+
 
 
 }
