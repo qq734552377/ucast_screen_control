@@ -28,17 +28,10 @@ public class FileTools {
 
         }
     }
-    public static void writeToLogFile( String data){
-        try{
-            File f = new File(CrashHandler.ALBUM_PATH + "/simple_log.txt");
-            FileOutputStream fout = new FileOutputStream(f , true);
-            BufferedOutputStream buff = new BufferedOutputStream(fout);
-            buff.write((millisToDateString(System.currentTimeMillis()) + " " + data + "\r\n").getBytes());
-            buff.flush();
-            buff.close();
-        }catch (Exception e){
 
-        }
+
+    public static void writeToLogFile( String data){
+        writeToFile(CrashHandler.ALBUM_PATH + "/simple_log.txt",millisToDateString(System.currentTimeMillis()) + " " + data);
     }
 
     public static String millisToDateString(long time) {

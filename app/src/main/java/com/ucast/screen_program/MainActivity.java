@@ -1,7 +1,9 @@
 package com.ucast.screen_program;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -151,7 +153,9 @@ public class MainActivity extends AppCompatActivity {
             UpdateService.screen = this.screen;
         }
 
-
+        if(UpdateService.wifiManager != null){
+            UpdateService.wifiManager.setWifiEnabled(false);
+        }
 
 //        cmd("ifconfig");
 //        MyHttpRequetTool.getAllPrograms(ScreenHttpRequestUrl.DOWNLOADFILEURL);
@@ -175,11 +179,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void connect() {
         if(this.screen.isConnected()) {
-            MainActivity.this.connButton.setEnabled(false);
-            MainActivity.this.disconnButton.setEnabled(true);
-            MainActivity.this.sendButton.setEnabled(true);
-            MainActivity.this.screenButton.setEnabled(true);
-            MainActivity.this.outputText.setText("CONN success");
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    MainActivity.this.connButton.setEnabled(false);
+                    MainActivity.this.disconnButton.setEnabled(true);
+                    MainActivity.this.sendButton.setEnabled(true);
+                    MainActivity.this.screenButton.setEnabled(true);
+                    MainActivity.this.outputText.setText("CONN success");
+                }
+            });
             return;
         }
         final TextView addrText = (TextView)findViewById(R.id.addrText);

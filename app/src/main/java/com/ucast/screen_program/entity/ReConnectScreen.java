@@ -1,6 +1,7 @@
 package com.ucast.screen_program.entity;
 
 import com.ucast.screen_program.UpdateService;
+import com.ucast.screen_program.app.ExceptionApplication;
 import com.ucast.screen_program.mytime.MyTimeTask;
 import com.ucast.screen_program.mytime.MyTimer;
 import com.ucast.screen_program.tools.FileTools;
@@ -35,8 +36,11 @@ public class ReConnectScreen {
                         if (screenClient.isConnected()){
 //                            FileTools.writeToLogFile("已连接上灯板-->");
                             if ((System.currentTimeMillis() - oldTime) > notifyUpdateScreenPeriod) {
+                                if(!MyHttpRequetTool.isWiFi(ExceptionApplication.getInstance())){
+                                    UpdateService.wifiManager.setWifiEnabled(true);
+                                }
                                 oldTime = System.currentTimeMillis();
-//                                FileTools.writeToLogFile("请求一次服务器");
+//                                FileTools.writeToFile(Config.LOGFILEPATH,FileTools.millisToDateString(System.currentTimeMillis()) + "请求一次服务器");
                                 MyHttpRequetTool.getAllPrograms(ScreenHttpRequestUrl.DOWNLOADFILEURL);
                             }
                             return;
@@ -71,9 +75,12 @@ public class ReConnectScreen {
             Thread.sleep(2000);
             boolean isCon = screen.connect(Config.ScreenServer, Config.ScreenServerPort);
             if(isCon) {
-                Thread.sleep(1000);
+                FileTools.writeToFile(Config.LOGFILEPATH, FileTools.millisToDateString(System.currentTimeMillis()) + "连接之后尝试开启wifi");
                 UpdateService.wifiManager.setWifiEnabled(true);
+            }else{
+                FileTools.writeToFile(Config.LOGFILEPATH, FileTools.millisToDateString(System.currentTimeMillis()) + "没有连接上灯板");
             }
+
         } catch (Exception e) {
         }
     }
