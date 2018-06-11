@@ -15,11 +15,15 @@ import android.widget.ToggleButton;
 import com.ucast.screen_program.entity.ReConnectScreen;
 import com.ucast.screen_program.entity.ScreenHttpRequestUrl;
 import com.ucast.screen_program.jsonObject.ProgramJsonObj;
+import com.ucast.screen_program.tools.FileTools;
 import com.ucast.screen_program.tools.MyHttpRequetTool;
 import com.ucast.screen_program.tools.MyScreenTools;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+
+//                cmd("ip route add 192.168.3.0/24 dev eth0 proto static scope link table wlan0");
                 new Thread(new Runnable() {
                     public void run() {
 //                        turnOnOff();
@@ -138,13 +144,20 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+        if (UpdateService.screen != null){
+            this.screen = UpdateService.screen;
+        }else{
+            this.screen = new Bx6GScreenClient("UcastScreen");
+            UpdateService.screen = this.screen;
+        }
 
-        this.screen = new Bx6GScreenClient("UcastScreen");
 
-        UpdateService.screen = this.screen;
 
+//        cmd("ifconfig");
 //        MyHttpRequetTool.getAllPrograms(ScreenHttpRequestUrl.DOWNLOADFILEURL);
     }
+
+
 
     private boolean testDeployOKorNot() {
         try {
@@ -161,8 +174,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void connect() {
-        if(this.screen.isConnected())
+        if(this.screen.isConnected()) {
+            MainActivity.this.connButton.setEnabled(false);
+            MainActivity.this.disconnButton.setEnabled(true);
+            MainActivity.this.sendButton.setEnabled(true);
+            MainActivity.this.screenButton.setEnabled(true);
+            MainActivity.this.outputText.setText("CONN success");
             return;
+        }
         final TextView addrText = (TextView)findViewById(R.id.addrText);
         final TextView portText = (TextView)findViewById(R.id.portText);
         if (screen.connect("" + addrText.getText(), Integer.parseInt("" + portText.getText()))) {
@@ -175,8 +194,7 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.this.outputText.setText("CONN success");
                 }
             });
-        }
-        else {
+        } else {
             runOnUiThread(new Runnable() {
                 public void run() {
                     MainActivity.this.outputText.setText("CONN failure");

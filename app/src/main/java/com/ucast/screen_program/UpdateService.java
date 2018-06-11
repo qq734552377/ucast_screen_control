@@ -2,7 +2,9 @@ package com.ucast.screen_program;
 
 import android.app.Notification;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -47,6 +49,7 @@ public class UpdateService extends Service {
 
     public static ThreadPoolExecutor poolExecutor;
     public static Bx6GScreenClient screen;
+    public static WifiManager wifiManager;
 
     @Nullable
     @Override
@@ -75,7 +78,7 @@ public class UpdateService extends Service {
         if (!file.exists()){
             file.mkdir();
         }
-
+        wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
 
 
         poolExecutor = new ThreadPoolExecutor(1, 1,
@@ -94,7 +97,6 @@ public class UpdateService extends Service {
 
     @Subscribe(threadMode = ThreadMode.MainThread, sticky = true)
     public void addTaskToQueue(String msg){
-        FileTools.writeToLogFile("调用了一次 UpdateService.addTaskToQueue()");
         writeToScreen(new MyScreenUpdateTask(screen));
     }
 

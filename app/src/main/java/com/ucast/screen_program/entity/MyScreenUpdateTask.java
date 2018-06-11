@@ -47,14 +47,20 @@ public class MyScreenUpdateTask implements Runnable{
                 for (int i = 0; i < programs.size(); i++) {
                     String name = programs.get(i);
                     if (name.contains("P")) {
-                        FileTools.writeToLogFile("灯板已有的节目  节目号为：" + name);
+
                         ids.add(MyScreenTools.getIdByProgramName(name));
                     }
                 }
-                ids = removeUnavialablePrograms(curScreen,ids,msgs);
+//                for (int i = 0; i < ids.size(); i++) {
+//                    FileTools.writeToLogFile("灯板已有的节目  节目号为：" + ids.get(i));
+//                }
+                List<Integer> ids_need = removeUnavialablePrograms(curScreen,ids,msgs);
+//                for (int i = 0; i < ids_need.size(); i++) {
+//                    FileTools.writeToLogFile("需要向灯板推送的  节目号为：" + ids_need.get(i));
+//                }
                 for (int i = 0; i < msgs.size(); i++) {
                     ProgramJsonObj one = msgs.get(i);
-                    if(!isExitInListID(one,ids)){
+                    if(!isExitInListID(one,ids_need)){
                         ProgramBxFile programBxFile = MyScreenTools.getOneProgramBxFileWithProgramJsonObj(curScreen.getProfile(),one);
                         if(programBxFile == null){
                             continue;

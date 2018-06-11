@@ -35,11 +35,10 @@ public class MyHttpRequetTool {
             @Override
             public void onSuccess(String result) {
                 BaseHttpResult base = JSON.parseObject(result, BaseHttpResult.class);
-                msgs = JSON.parseArray(base.getData(), ProgramJsonObj.class);
-                for (int i = 0; i <msgs.size() ; i++) {
-                    FileTools.writeToFile(Config.LOGFILEPATH,msgs.get(i).toString() + "-------------------");
+                if (base.getMsgType().equals("Success")) {
+                    msgs = JSON.parseArray(base.getData(), ProgramJsonObj.class);
+                    EventBus.getDefault().postSticky("this is getAllPrograms success");
                 }
-                EventBus.getDefault().postSticky("this is getAllPrograms success");
             }
 
             @Override

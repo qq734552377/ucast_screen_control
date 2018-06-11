@@ -3,7 +3,10 @@ package com.ucast.screen_program.entity;
 import com.ucast.screen_program.UpdateService;
 import com.ucast.screen_program.mytime.MyTimeTask;
 import com.ucast.screen_program.mytime.MyTimer;
+import com.ucast.screen_program.tools.FileTools;
 import com.ucast.screen_program.tools.MyHttpRequetTool;
+
+import java.io.File;
 
 import de.greenrobot.event.EventBus;
 import onbon.bx06.Bx6GScreenClient;
@@ -14,7 +17,6 @@ import onbon.bx06.Bx6GScreenClient;
 public class ReConnectScreen {
     private static MyTimer timer;
 
-    private static boolean restart;
 
     private static long oldTime;
 
@@ -25,24 +27,25 @@ public class ReConnectScreen {
             public void run() {
                 synchronized (ReConnectScreen.class) {
                     try {
-                        if (!restart)
-                            return;
                         Bx6GScreenClient screenClient = UpdateService.screen;
                         if (screenClient == null){
                             UpdateService.screen = new Bx6GScreenClient("UcastScreen");
+                            return;
                         }
                         if (screenClient.isConnected()){
+//                            FileTools.writeToLogFile("已连接上灯板-->");
                             if ((System.currentTimeMillis() - oldTime) > notifyUpdateScreenPeriod) {
                                 oldTime = System.currentTimeMillis();
+//                                FileTools.writeToLogFile("请求一次服务器");
                                 MyHttpRequetTool.getAllPrograms(ScreenHttpRequestUrl.DOWNLOADFILEURL);
                             }
                             return;
                         }
+//                        FileTools.writeToLogFile("没有连接上灯板上灯板--> 尝试连接灯板");
                         connect(screenClient);
                         oldTime = System.currentTimeMillis();
-                        restart = false;
                     } catch (Exception e) {
-                        restart = false;
+                        FileTools.writeToLogFile("定时器异常");
                     }
                 }
             }
@@ -52,18 +55,27 @@ public class ReConnectScreen {
 
     public static void check() {
         synchronized (ReConnectScreen.class) {
-            restart = true;
         }
     }
 
     public static void stopTimer(){
         synchronized (ReConnectScreen.class) {
-            restart = true;
             timer.stopMyTimer();
         }
     }
 
-    public static void connect(Bx6GScreenClient screen){
-        screen.connect(Config.ScreenServer,Config.ScreenServerPort);
+    public static void connect(Bx6GScreenClient screen) {
+        try {
+            screen.disconnect();
+            UpdateService.wifiManager.setWifiEnabled(false);
+            Thread.sleep(2000);
+            boolean isCon = screen.connect(Config.ScreenServer, Config.ScreenServerPort);
+            if(isCon) {
+                Thread.sleep(1000);
+                UpdateService.wifiManager.setWifiEnabled(true);
+            }
+        } catch (Exception e) {
+        }
     }
+
 }
