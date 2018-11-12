@@ -1,8 +1,5 @@
 package com.ucast.screen_program.tools;
 
-import android.os.Environment;
-
-import com.ucast.screen_program.app.CrashHandler;
 import com.ucast.screen_program.entity.Config;
 import com.ucast.screen_program.jsonObject.ProgramJsonObj;
 
@@ -72,7 +69,7 @@ public class MyScreenTools {
            p002.addArea(textAreaBottom);
 
        }catch (Exception e){
-
+           FileTools.writeToLogFile(e.toString());
        }
         return p002;
     }
@@ -94,23 +91,25 @@ public class MyScreenTools {
            //设定节目播放时间长度，单位为秒，0：循序播放。
            p002.setProgramTimeSpan(textProgram.getDuration());
            //设定是否显示边框
-           p002.setFrameShow(textProgram.isHaveFrame());
+           p002.setFrameShow(textProgram.getHaveFrame());
            //设置边框显示速度，1 - 48
            p002.setFrameSpeed(textProgram.getFrameSpeed());
            //styleIndex - 内建效果编号，双基色 1 ~ 18，单基色 1 ~ 14。
-           p002.loadFrameImage(textProgram.getFarmeStyle());
+           p002.loadFrameImage(textProgram.getFrameStyle());
+           //节目播放优先级  0：一般，1：优先
+           p002.setPriority(textProgram.getPriority());
 
            TextCaptionBxArea textAreaTop = new TextCaptionBxArea(0, 0, 128, 64, profile);
-           textAreaTop.setFrameShow(textProgram.isHaveFrame());
-           textAreaTop.loadFrameImage(textProgram.getFarmeStyle());
+           textAreaTop.setFrameShow(textProgram.getHaveFrame());
+           textAreaTop.loadFrameImage(textProgram.getFrameStyle());
            TextCaptionBxArea textAreaBottom = new TextCaptionBxArea(0, 64, 128, 64, profile);
-           textAreaBottom.setFrameShow(textProgram.isHaveFrame());
-           textAreaBottom.loadFrameImage(textProgram.getFarmeStyle());
+           textAreaBottom.setFrameShow(textProgram.getHaveFrame());
+           textAreaBottom.loadFrameImage(textProgram.getFrameStyle());
 
 
            TextBxPage page = new TextBxPage(textProgram.getTextContent());
            // 对文本的处理是否自动换行
-           page.setLineBreak(textProgram.isTextAutoNewLine());
+           page.setLineBreak(textProgram.getIsTextAutoNewLine());
            // 设置文本水平对齐方式
            page.setHorizontalAlignment(TextBinary.Alignment.NEAR);
            // 设置文本垂直居中方式
@@ -118,7 +117,7 @@ public class MyScreenTools {
            // 设置文本字体
            page.setFont(new Font(textProgram.getTexFontType() , Font.PLAIN, textProgram.getTexFontSize()));
            // 设置文本颜色
-           page.setForeground(Color.magenta);
+           page.setForeground(textProgram.getTexFontColor());
            // 设置区域背景色，默认为黑色
            page.setBackground(Color.BLACK);
            // 调整特技方式
@@ -135,7 +134,7 @@ public class MyScreenTools {
            p002.addArea(textAreaBottom);
 
        }catch (Exception e){
-
+            FileTools.writeToLogFile(e.toString());
        }
         return p002;
     }
@@ -192,18 +191,20 @@ public class MyScreenTools {
            //设定节目播放时间长度，单位为秒，0：循序播放。
            p002.setProgramTimeSpan(picProgram.getDuration());
            //设定是否显示边框
-           p002.setFrameShow(picProgram.isHaveFrame());
+           p002.setFrameShow(picProgram.getHaveFrame());
            //设置边框显示速度，1 - 48
            p002.setFrameSpeed(picProgram.getFrameSpeed());
            //styleIndex - 内建效果编号，双基色 1 ~ 18，单基色 1 ~ 14。
-           p002.loadFrameImage(picProgram.getFarmeStyle());
+           p002.loadFrameImage(picProgram.getFrameStyle());
+           //节目播放优先级  0：一般，1：优先
+           p002.setPriority(picProgram.getPriority());
 
            TextCaptionBxArea textAreaTop = new TextCaptionBxArea(0, 0, 128, 64, profile);
-           textAreaTop.setFrameShow(picProgram.isHaveFrame());
-           textAreaTop.loadFrameImage(picProgram.getFarmeStyle());
+           textAreaTop.setFrameShow(picProgram.getHaveFrame());
+           textAreaTop.loadFrameImage(picProgram.getFrameStyle());
            TextCaptionBxArea textAreaBottom = new TextCaptionBxArea(0, 64, 128, 64, profile);
-           textAreaBottom.setFrameShow(picProgram.isHaveFrame());
-           textAreaBottom.loadFrameImage(picProgram.getFarmeStyle());
+           textAreaBottom.setFrameShow(picProgram.getHaveFrame());
+           textAreaBottom.loadFrameImage(picProgram.getFrameStyle());
 
 
            ImageFileBxPage page = new ImageFileBxPage(path);
@@ -221,7 +222,7 @@ public class MyScreenTools {
            p002.addArea(textAreaBottom);
 
        }catch (Exception e){
-
+           FileTools.writeToLogFile(e.toString());
        }
         return p002;
     }
@@ -257,7 +258,7 @@ public class MyScreenTools {
            p002.addArea(textAreaTop);
 
        }catch (Exception e){
-
+           FileTools.writeToLogFile(e.toString());
        }
         return p002;
     }

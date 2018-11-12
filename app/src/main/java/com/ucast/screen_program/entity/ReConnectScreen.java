@@ -6,6 +6,7 @@ import com.ucast.screen_program.mytime.MyTimeTask;
 import com.ucast.screen_program.mytime.MyTimer;
 import com.ucast.screen_program.tools.FileTools;
 import com.ucast.screen_program.tools.MyHttpRequetTool;
+import com.ucast.screen_program.tools.WifiConnect;
 
 import java.io.File;
 
@@ -22,6 +23,7 @@ public class ReConnectScreen {
     private static long oldTime;
 
     private final static long notifyUpdateScreenPeriod = 10 * 1000L;
+    public static WifiConnect wifiConnect = new WifiConnect(UpdateService.wifiManager);
 
     public static void startTimer() {
         timer = new MyTimer(new MyTimeTask(new Runnable() {
@@ -53,7 +55,7 @@ public class ReConnectScreen {
                     }
                 }
             }
-        }), 2000L, 5000L);
+        }), 2000L, 6000L);
         timer.initMyTimer().startMyTimer();
     }
 
@@ -78,7 +80,7 @@ public class ReConnectScreen {
                 FileTools.writeToFile(Config.LOGFILEPATH, FileTools.millisToDateString(System.currentTimeMillis()) + "连接之后尝试开启wifi");
                 UpdateService.wifiManager.setWifiEnabled(true);
             }else{
-                FileTools.writeToFile(Config.LOGFILEPATH, FileTools.millisToDateString(System.currentTimeMillis()) + "没有连接上灯板");
+//                FileTools.writeToFile(Config.LOGFILEPATH, FileTools.millisToDateString(System.currentTimeMillis()) + "没有连接上灯板");
             }
 
         } catch (Exception e) {

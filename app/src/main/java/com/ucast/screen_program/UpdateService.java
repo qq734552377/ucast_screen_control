@@ -1,5 +1,6 @@
 package com.ucast.screen_program;
 
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
@@ -14,14 +15,19 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.ucast.screen_program.app.ExceptionApplication;
 import com.ucast.screen_program.entity.Config;
+import com.ucast.screen_program.entity.MyDialog;
 import com.ucast.screen_program.entity.ReConnectScreen;
 import com.ucast.screen_program.entity.ScreenHttpRequestUrl;
 import com.ucast.screen_program.jsonObject.BaseHttpResult;
 import com.ucast.screen_program.mytime.MyTimeTask;
 import com.ucast.screen_program.mytime.MyTimer;
+import com.ucast.screen_program.socket.TimerConnect.WhileCheckClient;
 import com.ucast.screen_program.tools.FileTools;
 import com.ucast.screen_program.tools.MyHttpRequetTool;
 import com.ucast.screen_program.entity.MyScreenUpdateTask;
+import com.ucast.screen_program.tools.SavePasswd;
+import com.ucast.screen_program.xutlsEvents.RunTaskEvent;
+import com.ucast.screen_program.xutlsEvents.TishiMsgEvent;
 
 import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
@@ -29,6 +35,7 @@ import org.xutils.x;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -50,6 +57,7 @@ public class UpdateService extends Service {
     public static ThreadPoolExecutor poolExecutor;
     public static Bx6GScreenClient screen;
     public static WifiManager wifiManager;
+    private Dialog msgDialog;
 
     @Nullable
     @Override
@@ -87,6 +95,10 @@ public class UpdateService extends Service {
 
         //开启节目请求
         ReConnectScreen.startTimer();
+//        MyHttpRequetTool.getAllPrograms(ScreenHttpRequestUrl.DOWNLOADFILEURL);
+        WhileCheckClient.StartTimer();
+
+        startTimer();
     }
 
     public static void writeToScreen(Runnable task){
@@ -94,11 +106,21 @@ public class UpdateService extends Service {
             return;
         poolExecutor.execute(task);
     }
+    @Subscribe(threadMode = ThreadMode.MainThread)
+    public void showTishiMsg(TishiMsgEvent event){
+        msgDialog = MyDialog.showUpdateResult(event.getMsg());
+        msgDialog.show();
+    }
 
     @Subscribe(threadMode = ThreadMode.MainThread, sticky = true)
-    public void addTaskToQueue(String msg){
-        writeToScreen(new MyScreenUpdateTask(screen));
+    public void addTaskToQueue(RunTaskEvent msg){
+
+        if (msg.getTask() == null)
+            writeToScreen(new MyScreenUpdateTask(screen));
+        else
+            writeToScreen(msg.getTask());
     }
+
 
     /**
      * 当服务被杀死时重启服务
@@ -116,11 +138,38 @@ public class UpdateService extends Service {
         timer = new MyTimer(new MyTimeTask(new Runnable() {
             @Override
             public void run() {
-                String url= ScreenHttpRequestUrl.TIMEUPDATEURL;
-                getSystemTime(url.trim());
+                String io = null;
+                try {
+                    io = FileTools.loadFileAsString(FileTools.INPUTIO);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                int ioInt = Integer.parseInt(io.replace("\n",""));
+                boolean isFire = (ioInt & 0x01) == 0 ? true : false;
+
+                boolean isPadOpen = FileTools.getPadIsOpen();
+
+//                EventBus.getDefault().post(new TishiMsgEvent(ioInt + (isFire ? "点火" : "熄火") + "  平板状态" + (isPadOpen ? "平板亮屏" : "平板息屏")));
+                if (isFire && !isPadOpen){//点火状态并且平板是息屏状态  点亮平板
+//                    FileTools.clickPad(3000);
+                    setPadState(true);
+                }else if (!isFire && isPadOpen){//熄火状态并且平板是亮屏状态  平板息屏
+                    FileTools.clickPad(200);
+                    setPadState(false);
+                }
+
+
             }
-        }), 1000*2L, 1*1000*60L);
+        }), 1000*2L, 10*1000L);
         timer.initMyTimer().startMyTimer();
+    }
+
+    public void setPadState(boolean isPadOpen){
+        if (isPadOpen){//平板不是亮屏，点亮
+            SavePasswd.getInstace().save(SavePasswd.PADSTATUS,SavePasswd.OPEN);
+        }else {//平板是亮屏，息屏
+            SavePasswd.getInstace().save(SavePasswd.PADSTATUS,SavePasswd.CLOSE);
+        }
     }
 
     private static final String TAG = "UpdateService";

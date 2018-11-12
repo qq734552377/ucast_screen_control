@@ -31,7 +31,7 @@ public class MyScreenUpdateTask implements Runnable{
         List<String> programs = null;
         Bx6GScreenClient curScreen = screen;
         List<ProgramJsonObj> msgs = MyHttpRequetTool.msgs;
-        if(msgs == null){
+        if(msgs == null || msgs.size() <= 0){
             FileTools.writeToLogFile("从网上获取的节目单为空");
             return;
         }
@@ -51,20 +51,22 @@ public class MyScreenUpdateTask implements Runnable{
                         ids.add(MyScreenTools.getIdByProgramName(name));
                     }
                 }
-//                for (int i = 0; i < ids.size(); i++) {
+                for (int i = 0; i < ids.size(); i++) {
 //                    FileTools.writeToLogFile("灯板已有的节目  节目号为：" + ids.get(i));
-//                }
+                }
                 List<Integer> ids_need = removeUnavialablePrograms(curScreen,ids,msgs);
-//                for (int i = 0; i < ids_need.size(); i++) {
-//                    FileTools.writeToLogFile("需要向灯板推送的  节目号为：" + ids_need.get(i));
-//                }
+                for (int i = 0; i < ids_need.size(); i++) {
+//                    FileTools.writeToLogFile("需要向灯板推送的  可能的节目号为：" + ids_need.get(i));
+                }
                 for (int i = 0; i < msgs.size(); i++) {
                     ProgramJsonObj one = msgs.get(i);
                     if(!isExitInListID(one,ids_need)){
                         ProgramBxFile programBxFile = MyScreenTools.getOneProgramBxFileWithProgramJsonObj(curScreen.getProfile(),one);
                         if(programBxFile == null){
+                            FileTools.writeToLogFile(one.getId() + "节目为null");
                             continue;
                         }
+                        FileTools.writeToLogFile(programBxFile.toString());
                         try {
                             FileTools.writeToLogFile("向灯板推送节目  节目号为：" + one.getId());
                             curScreen.writeProgramQuickly(programBxFile);

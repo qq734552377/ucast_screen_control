@@ -7,8 +7,10 @@ import android.net.NetworkInfo;
 import com.alibaba.fastjson.JSON;
 import com.ucast.screen_program.app.ExceptionApplication;
 import com.ucast.screen_program.entity.Config;
+import com.ucast.screen_program.entity.ReConnectScreen;
 import com.ucast.screen_program.jsonObject.BaseHttpResult;
 import com.ucast.screen_program.jsonObject.ProgramJsonObj;
+import com.ucast.screen_program.xutlsEvents.RunTaskEvent;
 
 import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
@@ -27,8 +29,12 @@ public class MyHttpRequetTool {
 
 
     public static void getAllPrograms(String url){
-        if (!isNetworkAvailable(ExceptionApplication.getInstance()))
+        if (!WifiConnect.isWifiConnect()){
+//            ReConnectScreen.wifiConnect.connect(WifiConnect.WIFI_NAME,WifiConnect.WIFI_PWD,WifiConnect.WifiCipherType.WIFICIPHER_NOPASS);
+        }
+        if (!isNetworkAvailable(ExceptionApplication.getInstance())) {
             return;
+        }
         RequestParams params = new RequestParams(url);
         params.addBodyParameter("Sn", Config.STATION_ID);
         x.http().post(params, new Callback.CommonCallback<String>() {
@@ -37,7 +43,8 @@ public class MyHttpRequetTool {
                 BaseHttpResult base = JSON.parseObject(result, BaseHttpResult.class);
                 if (base.getMsgType().equals("Success")) {
                     msgs = JSON.parseArray(base.getData(), ProgramJsonObj.class);
-                    EventBus.getDefault().postSticky("this is getAllPrograms success");
+                    EventBus.getDefault().postSticky(new RunTaskEvent(null,"this is getAllPrograms success"));
+//                    FileTools.writeToLogFile("this is getAllPrograms success" + msgs.size());
                 }
             }
 
@@ -66,7 +73,7 @@ public class MyHttpRequetTool {
         x.http().get(requestParams, new Callback.CommonCallback<File>() {
             @Override
             public void onSuccess(File result) {
-                EventBus.getDefault().postSticky("this is downLoadOnePic success");
+                EventBus.getDefault().postSticky(new RunTaskEvent(null,"this is downLoadOnePic success"));
             }
 
             @Override

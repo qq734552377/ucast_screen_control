@@ -1,5 +1,8 @@
 package com.ucast.screen_program.jsonObject;
 
+
+import java.awt.Color;
+
 /**
  * Created by pj on 2018/4/28.
  */
@@ -11,36 +14,36 @@ public class ProgramJsonObj {
     //节目结束日期
     private String endData ;
     //节目播放优先级  0：一般，1：优先
-    private String priority ;
+    private int priority = 0;
     //节目是否展示
-    private boolean isDisplay ;
+    private String isDisplay ;
     //节目播放时长 单位 1s
     private int duration = 20;
     //是否有边框
-    private boolean haveFrame;
+    private String haveFrame;
     //边框显示速度 1（快） - 48 （慢）
-    private int frameSpeed;
+    private int frameSpeed = 2;
     //边框效果 0：闪烁。1：顺时针转动。2：逆时钟转动。3：闪烁并顺时钟转动。
     // 4：闪烁并逆时钟转动。5：红绿交替闪烁。6：红绿交替转动。7：静止打出。
-    private int farmeStyle = 1;
+    private int frameStyle = 7;
     //节目展示类型 1: 文字  2:图片
     private int programType;
     //特技方式 0 - 48 0为随机
-    private int displayStyle;
+    private int displayStyle = 0;
     //特技速度 1（快） - 48 （慢）
-    private int displayStyleSpeed = 2;
-    //特技结束后的节目展示时间 单位10ms
-    private int stayDuration = 100;
+    private int displayStyleSpeed = 1;
+    //特技结束后的节目展示时间 单位s
+    private int stayDuration = 10;
     //图片的下载地址
     private String picDownLoadUrl;
     //文字内容
     private String textContent;
     //文本是否自动换行
-    private boolean isTextAutoNewLine;
+    private String isTextAutoNewLine;
     //文字水平对齐方式 1:中 2:右或下  2:左或上
-    private int horizontalAlignment;
+    private int horizontalAlignment = 1;
     //文字垂直对齐方式 1:中 2:右或下  2:左或上
-    private int verticalAlignment;
+    private int verticalAlignment = 1;
     //文字字体
     private String texFontType = "Arial";
     //文字字体大小
@@ -49,7 +52,7 @@ public class ProgramJsonObj {
     private String texFontColor;
 
     public int getId() {
-        return id;
+        return id % 999;
     }
 
     public void setId(int id) {
@@ -72,23 +75,28 @@ public class ProgramJsonObj {
         this.endData = endData;
     }
 
-    public String getPriority() {
+    public int getPriority() {
         return priority;
     }
 
-    public void setPriority(String priority) {
+    public void setPriority(int priority) {
         this.priority = priority;
     }
 
-    public boolean isDisplay() {
-        return isDisplay;
+
+    public boolean getIsDisplay() {
+        if (isDisplay != null && isDisplay.equals("true"))
+            return true;
+        return false;
     }
 
-    public void setDisplay(boolean display) {
-        isDisplay = display;
+    public void setIsDisplay(String isDisplay) {
+        this.isDisplay = isDisplay;
     }
 
     public int getDuration() {
+        if(duration <= 0)
+            return 20;
         return duration;
     }
 
@@ -96,15 +104,19 @@ public class ProgramJsonObj {
         this.duration = duration;
     }
 
-    public boolean isHaveFrame() {
-        return haveFrame;
+    public boolean getHaveFrame() {
+        if (haveFrame != null && haveFrame.equals("true"))
+            return true;
+        return false;
     }
 
-    public void setHaveFrame(boolean haveFrame) {
+    public void setHaveFrame(String haveFrame) {
         this.haveFrame = haveFrame;
     }
 
     public int getFrameSpeed() {
+        if (frameSpeed <=0)
+            return 2;
         return frameSpeed;
     }
 
@@ -112,12 +124,14 @@ public class ProgramJsonObj {
         this.frameSpeed = frameSpeed;
     }
 
-    public int getFarmeStyle() {
-        return farmeStyle;
+    public int getFrameStyle() {
+        if (frameStyle <= 0)
+            return 0;
+        return frameStyle;
     }
 
-    public void setFarmeStyle(int farmeStyle) {
-        this.farmeStyle = farmeStyle;
+    public void setFrameStyle(int frameStyle) {
+        this.frameStyle = frameStyle;
     }
 
     public int getProgramType() {
@@ -129,6 +143,8 @@ public class ProgramJsonObj {
     }
 
     public int getDisplayStyle() {
+        if (displayStyle <= 0)
+            return 0;
         return displayStyle;
     }
 
@@ -137,6 +153,8 @@ public class ProgramJsonObj {
     }
 
     public int getDisplayStyleSpeed() {
+        if (displayStyleSpeed <= 0)
+            return 1;
         return displayStyleSpeed;
     }
 
@@ -145,7 +163,9 @@ public class ProgramJsonObj {
     }
 
     public int getStayDuration() {
-        return stayDuration;
+        if (stayDuration <= 0)
+            return 1000;
+        return stayDuration * 100;
     }
 
     public void setStayDuration(int stayDuration) {
@@ -168,15 +188,19 @@ public class ProgramJsonObj {
         this.textContent = textContent;
     }
 
-    public boolean isTextAutoNewLine() {
-        return isTextAutoNewLine;
+    public boolean getIsTextAutoNewLine() {
+        if (isTextAutoNewLine == null || isTextAutoNewLine.equals("true"))
+            return true;
+        return false;
     }
 
-    public void setTextAutoNewLine(boolean textAutoNewLine) {
-        isTextAutoNewLine = textAutoNewLine;
+    public void setIsTextAutoNewLine(String isTextAutoNewLine) {
+        this.isTextAutoNewLine = isTextAutoNewLine;
     }
 
     public int getHorizontalAlignment() {
+        if (horizontalAlignment <= 0)
+            return 1;
         return horizontalAlignment;
     }
 
@@ -185,6 +209,8 @@ public class ProgramJsonObj {
     }
 
     public int getVerticalAlignment() {
+        if (verticalAlignment <= 0)
+            return 1;
         return verticalAlignment;
     }
 
@@ -193,6 +219,8 @@ public class ProgramJsonObj {
     }
 
     public String getTexFontType() {
+        if (texFontType == null)
+            return "Arial";
         return texFontType;
     }
 
@@ -201,6 +229,8 @@ public class ProgramJsonObj {
     }
 
     public int getTexFontSize() {
+        if (texFontSize <= 0)
+            return 14;
         return texFontSize;
     }
 
@@ -208,8 +238,13 @@ public class ProgramJsonObj {
         this.texFontSize = texFontSize;
     }
 
-    public String getTexFontColor() {
-        return texFontColor;
+    public Color getTexFontColor() {
+        if (texFontColor == null || texFontColor.length() < 6)
+            return Color.red;
+        int red = Integer.parseInt(texFontColor.substring(0,2));
+        int green = Integer.parseInt(texFontColor.substring(2,4));
+        int blue = Integer.parseInt(texFontColor.substring(4,6));
+        return new Color(red & 0xFF,green & 0xFF,blue & 0xFF);
     }
 
     public void setTexFontColor(String texFontColor) {
@@ -227,7 +262,7 @@ public class ProgramJsonObj {
                 ", \nduration=" + duration +
                 ", \nhaveFrame=" + haveFrame +
                 ", \nframeSpeed=" + frameSpeed +
-                ", \nfarmeStyle=" + farmeStyle +
+                ", \nframeStyle=" + frameStyle +
                 ", \nprogramType=" + programType +
                 ", \ndisplayStyle=" + displayStyle +
                 ", \ndisplayStyleSpeed=" + displayStyleSpeed +

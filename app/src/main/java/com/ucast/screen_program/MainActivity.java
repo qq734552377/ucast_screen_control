@@ -258,12 +258,13 @@ public class MainActivity extends AppCompatActivity {
         try {
             ProgramBxFile p1 = MyScreenTools.getOneProgramBxFileWithText(screen.getProfile(),231,msgText.getText().toString());
             ProgramBxFile p2 = MyScreenTools.getOneProgramBxFileWithPicpath(screen.getProfile(),783,filePath2);
+            FileTools.writeToLogFile(p2.toString());
             ProgramBxFile p3 = MyScreenTools.getOneProgramBxFileWithGoodPicpath(screen.getProfile(),40,filePath1);
-            ProgramBxFile p4 = MyScreenTools.getOneProgramBxFileWithText(screen.getProfile(),111,"大王叫我来巡山");
+//            ProgramBxFile p4 = MyScreenTools.getOneProgramBxFileWithText(screen.getProfile(),111,"大王叫我来巡山");
             screen.writeProgramQuickly(p1);
             screen.writeProgramQuickly(p2);
             screen.writeProgramQuickly(p3);
-            screen.writeProgramQuickly(p4);
+//            screen.writeProgramQuickly(p4);
             runOnUiThread(new Runnable() {
                 public void run() {
                     MainActivity.this.outputText.setText("WRITE OK");
